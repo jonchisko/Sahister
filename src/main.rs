@@ -1,11 +1,12 @@
 use bevy::prelude::*;
+use crate::camera_controller::CameraControllerPlugin;
 
 const GRID: u8 = 8;
 const TILE_DIM: u8 = 32;
 const NORMAL_MAP_TILE_PATH: &str = "./sprites/map/normal_set/";
-const CAMERA_MOVE_SPEED: f32 = 3.0f32;
 
 mod logger;
+mod camera_controller;
 
 fn main() {
     App::new()
@@ -17,6 +18,7 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .add_plugins(DefaultPlugins)
+        .add_plugin(CameraControllerPlugin)
         .add_startup_system_set(
             SystemSet::new()
                 .with_system(setup)
@@ -25,7 +27,6 @@ fn main() {
             SystemSet::new()
                 .with_system(create_chessboard)
                 .with_system(execute_destroy_chessboard)
-                .with_system(camera_mover)
         )
         .run();
 }
@@ -42,26 +43,8 @@ struct MapTiles {
     white_tile: Handle<Image>,
 }
 
-#[derive(Default)]
-struct PrevCursorPos {
-    pos: Option<Vec2>,
-}
-
-#[derive(Component)]
-struct MainCamera;
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let mut camera = OrthographicCameraBundle::new_2d();
-    camera.orthographic_projection.scale = 0.33;
-
-    commands
-        .spawn_bundle(camera)
-        .insert(MainCamera);
-
-    commands.insert_resource(PrevCursorPos {
-        pos: None,
-    });
-
     commands.insert_resource(MapTiles {
         black_tile: asset_server.load(&(NORMAL_MAP_TILE_PATH.to_string() + "map_tile_dark.png")),
         white_tile: asset_server.load(&(NORMAL_MAP_TILE_PATH.to_string() + "map_tile_white.png")),
@@ -113,34 +96,4 @@ fn execute_destroy_chessboard(
     if input.just_pressed(KeyCode::A) {
         destroy_chessboard(commands, tiles_query)
     }
-}
-
-fn camera_mover(
-    mut prev_cursor_pos: ResMut<PrevCursorPos>,
-    mut camera: Query<&mut Transform, With<MainCamera>>,
-    mouse_input: Res<Input<MouseButton>>,
-    windows: Res<Windows>,
-) {
-    let cursor_pos = windows.get_primary().expect("Could not get primary window").cursor_position();
-    if mouse_input.pressed(MouseButton::Right) && cursor_pos.is_some() {
-        let camera_move: Option<Vec2> = match prev_cursor_pos.pos {
-            Some(prev_val) => {
-                Some((prev_val - cursor_pos.unwrap()).normalize_or_zero())
-            },
-            None => {
-                None
-            }
-        };
-
-        match camera_move {
-            Some(dir) => {
-                let mut camera = camera.single_mut();
-                let cur_translation = camera.translation;
-                camera.translation = Vec3::new(cur_translation.x + dir.x * CAMERA_MOVE_SPEED, cur_translation.y + dir.y * CAMERA_MOVE_SPEED, 0.0);
-            },
-            None => {}
-        }
-    }
-
-    prev_cursor_pos.pos = cursor_pos;
 }

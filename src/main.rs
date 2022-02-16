@@ -8,6 +8,10 @@ const NORMAL_MAP_TILE_PATH: &str = "./sprites/map/normal_set/";
 mod logger;
 mod camera_controller;
 mod app_states;
+mod button_events;
+mod main_menu;
+mod set_menu;
+mod credits_menu;
 
 fn main() {
     App::new()

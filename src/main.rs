@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use main_menu::MainMenuPlugin;
 use crate::camera_controller::CameraControllerPlugin;
 
 const GRID: u8 = 8;
@@ -22,6 +23,7 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .add_plugins(DefaultPlugins)
         .add_plugin(CameraControllerPlugin)
+        .add_plugin(MainMenuPlugin)
         .add_startup_system_set(
             SystemSet::new()
                 .with_system(setup)

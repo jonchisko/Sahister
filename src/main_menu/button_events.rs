@@ -1,7 +1,7 @@
-struct StartGameEvent;
+pub struct StartGameEvent;
 
-struct SetMenuEvent;
+pub struct SetMenuEvent;
 
-struct CreditsMenuEvent;
+pub struct CreditsMenuEvent;
 
-struct MainMenuEvent;
+pub struct MainMenuEvent;

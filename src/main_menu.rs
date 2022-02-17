@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 use crate::app_states::AppState;
 
+mod set_menu;
+mod credits_menu;
+mod button_events;
+
 pub struct MainMenuPlugin;
 
 impl Plugin for MainMenuPlugin {

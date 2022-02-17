@@ -148,7 +148,6 @@ fn handle_menu_buttons(
     mut set_event: EventWriter<SetMenuEvent>,
     mut credits_event: EventWriter<CreditsMenuEvent>,
     mut exit_event: EventWriter<AppExit>,
-    mut app_state: ResMut<State<AppState>>,
 ) {
     for (interaction, mut color, button) in interaction_query.iter_mut() {
         match *interaction {
@@ -157,7 +156,6 @@ fn handle_menu_buttons(
                 match button.button_type {
                     MenuButtonType::PlayButton => {
                         start_event.send(StartGameEvent);
-                        app_state.set(AppState::InGame).unwrap();
                     },
                     MenuButtonType::SkinSetsButton => {
                         set_event.send(SetMenuEvent);

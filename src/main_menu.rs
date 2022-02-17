@@ -132,9 +132,12 @@ fn setup_menu(
 }
 
 fn close_menu(
-    mut commands: Commands
+    mut commands: Commands,
+    main_menu_buttons: Query<Entity, With<Node>>
 ) {
-    
+    for entity_id in main_menu_buttons.iter() {
+        commands.entity(entity_id).despawn();
+    }
 }
 
 fn handle_menu_buttons(
@@ -144,7 +147,8 @@ fn handle_menu_buttons(
     mut start_event: EventWriter<StartGameEvent>,
     mut set_event: EventWriter<SetMenuEvent>,
     mut credits_event: EventWriter<CreditsMenuEvent>,
-    mut exit_event: EventWriter<AppExit>
+    mut exit_event: EventWriter<AppExit>,
+    mut app_state: ResMut<State<AppState>>,
 ) {
     for (interaction, mut color, button) in interaction_query.iter_mut() {
         match *interaction {
@@ -153,6 +157,7 @@ fn handle_menu_buttons(
                 match button.button_type {
                     MenuButtonType::PlayButton => {
                         start_event.send(StartGameEvent);
+                        app_state.set(AppState::InGame).unwrap();
                     },
                     MenuButtonType::SkinSetsButton => {
                         set_event.send(SetMenuEvent);

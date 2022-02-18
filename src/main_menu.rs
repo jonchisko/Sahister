@@ -30,6 +30,7 @@ impl Plugin for MainMenuPlugin {
                 SystemSet::on_update(AppState::MainMenu)
                 .with_system(handle_menu_buttons)
                 .with_system(handle_set_menu_transition)
+                .with_system(handle_start_game_transition)
             )
             .add_system_set(
                 SystemSet::on_exit(AppState::MainMenu)
@@ -176,6 +177,20 @@ fn handle_set_menu_transition(
 ) {
     if event_reader.iter().next().is_some() {
         match app_state.set(AppState::SetMenu) {
+            Ok(_) => {},
+            Err(msg) => {
+                logger::log(msg);
+            }
+        }
+    }
+}
+
+fn handle_start_game_transition(
+    mut app_state: ResMut<State<AppState>>,
+    mut event_reader: EventReader<StartGameEvent>,
+) {
+    if event_reader.iter().next().is_some() {
+        match app_state.set(AppState::InGame) {
             Ok(_) => {},
             Err(msg) => {
                 logger::log(msg);

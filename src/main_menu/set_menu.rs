@@ -28,7 +28,6 @@ impl Plugin for SetMenuPlugin {
 #[derive(Component, PartialEq)]
 struct SetButton {
     button_type: SetButtonType,
-    selected: bool,
 }
 
 impl ClassicButton for SetButton {
@@ -87,11 +86,9 @@ fn setup_set_menu(
                 vec![
                     SetButton {
                         button_type: SetButtonType::SetNormalChessboard,
-                        selected: true
                     },
                     SetButton {
                         button_type: SetButtonType::SetWoodChessboard,
-                        selected: false
                     }
                 ],
                 ButtonBuilder::build_button,
@@ -105,19 +102,15 @@ fn setup_set_menu(
             vec![
                 SetButton {
                     button_type: SetButtonType::SetNormalSet,
-                    selected: true
                 },
                 SetButton {
                     button_type: SetButtonType::SetBwSet,
-                    selected: false
                 },
                 SetButton {
                     button_type: SetButtonType::SetRbSet,
-                    selected: false
                 },
                 SetButton {
                     button_type: SetButtonType::BackToMainMenu,
-                    selected: false
                 }
             ],
             ButtonBuilder::build_button,

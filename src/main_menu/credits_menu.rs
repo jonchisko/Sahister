@@ -6,7 +6,6 @@ pub struct CreditsMenuPlugin;
 impl Plugin for CreditsMenuPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_state(AppState::CreditsMenu)
             .add_system_set(
                 SystemSet::on_enter(AppState::CreditsMenu)
                 .with_system(setup_credits_menu)

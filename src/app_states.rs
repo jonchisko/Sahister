@@ -2,6 +2,5 @@
 pub enum AppState {
     MainMenu,
     SetMenu,
-    CreditsMenu,
     InGame
 }

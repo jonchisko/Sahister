@@ -1,15 +1,13 @@
 use bevy::prelude::*;
 use bevy::app::AppExit;
 use set_menu::SetMenuPlugin;
-use credits_menu::CreditsMenuPlugin;
 use crate::{app_states::AppState, logger};
 use button_builder::{ButtonType, ClassicButton, ButtonBuilder};
-use button_events::{StartGameEvent, SetMenuEvent, CreditsMenuEvent};
+use button_events::{StartGameEvent, SetMenuEvent};
 
 use self::button_events::MainMenuEvent;
 
 mod set_menu;
-mod credits_menu;
 mod button_events;
 mod button_builder;
 mod panel_builder;
@@ -22,7 +20,6 @@ impl Plugin for MainMenuPlugin {
             .add_state(AppState::MainMenu)
             .add_event::<StartGameEvent>()
             .add_event::<SetMenuEvent>()
-            .add_event::<CreditsMenuEvent>()
             .add_event::<MainMenuEvent>()
             .add_system(handle_back_to_main_menu_transition)
             .add_system_set(
@@ -33,14 +30,12 @@ impl Plugin for MainMenuPlugin {
                 SystemSet::on_update(AppState::MainMenu)
                 .with_system(handle_menu_buttons)
                 .with_system(handle_set_menu_transition)
-                .with_system(handle_credits_menu_transition)
             )
             .add_system_set(
                 SystemSet::on_exit(AppState::MainMenu)
                 .with_system(close_menu)
             )
-            .add_plugin(SetMenuPlugin)
-            .add_plugin(CreditsMenuPlugin);
+            .add_plugin(SetMenuPlugin);
     }
 }
 
@@ -63,7 +58,6 @@ impl ClassicButton for MenuButton {
 enum MenuButtonType {
     PlayButton,
     SkinSetsButton,
-    CreditsButton,
     QuitButton,
 }
 
@@ -72,7 +66,6 @@ impl ButtonType for MenuButtonType {
         match self {
             MenuButtonType::PlayButton => {String::from("PLAY")},
             MenuButtonType::SkinSetsButton => {String::from("SKIN SETS")},
-            MenuButtonType::CreditsButton => {String::from("CREDITS")},
             MenuButtonType::QuitButton => {String::from("QUIT")},
         }
     }
@@ -126,14 +119,6 @@ fn setup_menu(
             ButtonBuilder::build_button(
                 parent, 
                 MenuButton {
-                    button_type: MenuButtonType::CreditsButton,
-                    },
-                    &asset_server,    
-            );
-
-            ButtonBuilder::build_button(
-                parent, 
-                MenuButton {
                     button_type: MenuButtonType::QuitButton,
                     },
                     &asset_server,    
@@ -157,7 +142,6 @@ fn handle_menu_buttons(
         (Changed<Interaction>, With<Button>)>,
     mut start_event: EventWriter<StartGameEvent>,
     mut set_event: EventWriter<SetMenuEvent>,
-    mut credits_event: EventWriter<CreditsMenuEvent>,
     mut exit_event: EventWriter<AppExit>,
 ) {
     for (interaction, mut color, button) in interaction_query.iter_mut() {
@@ -170,9 +154,6 @@ fn handle_menu_buttons(
                     },
                     MenuButtonType::SkinSetsButton => {
                         set_event.send(SetMenuEvent);
-                    },
-                    MenuButtonType::CreditsButton => {
-                        credits_event.send(CreditsMenuEvent);
                     },
                     MenuButtonType::QuitButton => {
                         exit_event.send(AppExit);
@@ -195,20 +176,6 @@ fn handle_set_menu_transition(
 ) {
     if event_reader.iter().next().is_some() {
         match app_state.set(AppState::SetMenu) {
-            Ok(_) => {},
-            Err(msg) => {
-                logger::log(msg);
-            }
-        }
-    }
-}
-
-fn handle_credits_menu_transition(
-    mut app_state: ResMut<State<AppState>>,
-    mut event_reader: EventReader<CreditsMenuEvent>,
-) {
-    if event_reader.iter().next().is_some() {
-        match app_state.set(AppState::CreditsMenu) {
             Ok(_) => {},
             Err(msg) => {
                 logger::log(msg);

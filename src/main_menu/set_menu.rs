@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 use crate::app_states::AppState;
 use super::panel_builder::PanelBuilder;
-use super::button_builder::ButtonBuilder;
-use super::button_builder::{ButtonType, ClassicButton};
+use super::button_events::MainMenuEvent;
+use crate::{SkinSetResource, ChessboardType, FiguresType};
+use super::button_builder::{self, ButtonBuilder, ButtonType, ClassicButton};
 
 pub struct SetMenuPlugin;
 
@@ -24,9 +25,10 @@ impl Plugin for SetMenuPlugin {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, PartialEq)]
 struct SetButton {
     button_type: SetButtonType,
+    selected: bool,
 }
 
 impl ClassicButton for SetButton {
@@ -39,7 +41,7 @@ impl ClassicButton for SetButton {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 enum SetButtonType {
     SetNormalChessboard,
     SetWoodChessboard,
@@ -55,8 +57,8 @@ impl ButtonType for SetButtonType {
             SetButtonType::SetNormalChessboard => {String::from("NORMAL")},
             SetButtonType::SetWoodChessboard => {String::from("WOODEN")},
             SetButtonType::SetBwSet => {String::from("BLACK 'n WHITE")},
-            SetButtonType::SetNormalSet => {String::from("RED 'n BLUE")},
-            SetButtonType::SetRbSet => {String::from("NORMAL")},
+            SetButtonType::SetNormalSet => {String::from("NORMAL")},
+            SetButtonType::SetRbSet => {String::from("RED 'n BLUE")},
             SetButtonType::BackToMainMenu => {String::from("MAIN MENU")},
         }
     }
@@ -84,10 +86,12 @@ fn setup_set_menu(
                 &asset_server,
                 vec![
                     SetButton {
-                        button_type: SetButtonType::SetNormalChessboard
+                        button_type: SetButtonType::SetNormalChessboard,
+                        selected: true
                     },
                     SetButton {
-                        button_type: SetButtonType::SetWoodChessboard
+                        button_type: SetButtonType::SetWoodChessboard,
+                        selected: false
                     }
                 ],
                 ButtonBuilder::build_button,
@@ -100,16 +104,20 @@ fn setup_set_menu(
             &asset_server,
             vec![
                 SetButton {
-                    button_type: SetButtonType::SetNormalSet
+                    button_type: SetButtonType::SetNormalSet,
+                    selected: true
                 },
                 SetButton {
-                    button_type: SetButtonType::SetBwSet
+                    button_type: SetButtonType::SetBwSet,
+                    selected: false
                 },
                 SetButton {
-                    button_type: SetButtonType::SetRbSet
+                    button_type: SetButtonType::SetRbSet,
+                    selected: false
                 },
                 SetButton {
-                    button_type: SetButtonType::BackToMainMenu
+                    button_type: SetButtonType::BackToMainMenu,
+                    selected: false
                 }
             ],
             ButtonBuilder::build_button,
@@ -118,13 +126,53 @@ fn setup_set_menu(
 }
 
 fn handle_set_buttons(
-
+    mut interaction_query: Query<
+        (&Interaction, &mut UiColor, &SetButton),
+        (Changed<Interaction>, With<Button>)>,
+    mut skin_res: ResMut<SkinSetResource>,
+    mut event_writer: EventWriter<MainMenuEvent>,
 ) {
 
+    for (interaction, mut color, button) in interaction_query.iter_mut() {
+        match interaction {
+            Interaction::Clicked => {
+                *color = UiColor(button_builder::PRESSED_BUTTON);
+                match button.button_type {
+                    SetButtonType::SetNormalChessboard => {
+                        skin_res.selected_chessboard = Some(ChessboardType::Normal);
+                    },
+                    SetButtonType::SetWoodChessboard => {
+                        skin_res.selected_chessboard = Some(ChessboardType::Wooden);
+                    },
+                    SetButtonType::SetNormalSet => {
+                        skin_res.selected_figures = Some(FiguresType::Normal);
+                    },
+                    SetButtonType::SetBwSet => {
+                        skin_res.selected_figures = Some(FiguresType::Bw);
+                    },
+                    SetButtonType::SetRbSet => {
+                        skin_res.selected_figures = Some(FiguresType::Rb);
+                    },
+                    SetButtonType::BackToMainMenu => {
+                        event_writer.send(MainMenuEvent);
+                    }
+                }
+            },
+            Interaction::Hovered => {
+                *color = UiColor(button_builder::HOVERED_BUTTON);
+            },
+            Interaction::None => {
+                *color = UiColor(button_builder::NORMAL_BUTTON);
+            },
+        }
+    }
 }
 
 fn close_set_menu(
-
+    mut commands: Commands,
+    set_menu_buttons: Query<Entity, With<Node>>
 ) {
-
+    for entity_id in set_menu_buttons.iter() {
+        commands.entity(entity_id).despawn();
+    }
 }

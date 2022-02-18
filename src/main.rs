@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bevy::prelude::*;
 use main_menu::MainMenuPlugin;
 use crate::camera_controller::CameraControllerPlugin;
@@ -49,11 +51,57 @@ struct MapTiles {
 }
 
 
+#[derive(std::cmp::Eq, PartialEq, Hash)]
+enum ChessboardType {
+    Normal,
+    Wooden,
+}
+
+#[derive(std::cmp::Eq, PartialEq, Hash)]
+enum FiguresType {
+    Normal,
+    Bw,
+    Rb,
+}
+
+#[derive(Default)]
+struct SkinSetResource {
+    chessboard: HashMap<ChessboardType, String>,
+    figures: HashMap<FiguresType, String>,
+    selected_chessboard: Option<ChessboardType>,
+    selected_figures: Option<FiguresType>,
+}
+
+impl SkinSetResource {
+    fn new() -> SkinSetResource {
+        let mut res = SkinSetResource {
+            chessboard: HashMap::new(),
+            figures: HashMap::new(),
+            selected_chessboard: None,
+            selected_figures: None,
+        };
+
+        res.chessboard.insert(ChessboardType::Normal, String::from("./sprites/map/normal_set/"));
+        res.chessboard.insert(ChessboardType::Wooden, String::from("./sprites/map/wooden_set/"));
+
+        res.figures.insert(FiguresType::Normal, String::from("./sprites/figures/normal_set/"));
+        res.figures.insert(FiguresType::Bw, String::from("./sprites/figures/blackwhite_set/"));
+        res.figures.insert(FiguresType::Rb, String::from("./sprites/figures/redblue_set/"));
+
+        res.selected_chessboard = Some(ChessboardType::Normal);
+        res.selected_figures = Some(FiguresType::Normal);
+
+        res
+    }
+}
+
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(MapTiles {
         black_tile: asset_server.load(&(NORMAL_MAP_TILE_PATH.to_string() + "map_tile_dark.png")),
         white_tile: asset_server.load(&(NORMAL_MAP_TILE_PATH.to_string() + "map_tile_white.png")),
     });
+
+    commands.insert_resource(SkinSetResource::new());
 }
 
 fn create_chessboard(

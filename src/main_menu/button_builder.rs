@@ -14,7 +14,7 @@ impl ButtonBuilder {
     ) {
         commands.spawn_bundle(ButtonBundle {
             style: Style {
-                size: Size::new(Val::Px(200.0), Val::Px(75.0)),
+                size: Size::new(Val::Px(250.0), Val::Px(75.0)),
                 margin: Rect::all(Val::Auto),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,

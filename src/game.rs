@@ -2,12 +2,15 @@ use std::collections::HashMap;
 
 use bevy::prelude::*;
 use crate::SkinSetResource;
+use figures::{ChessTile, Figure};
 use crate::app_states::AppState;
 use crate::camera_controller::CameraControllerPlugin;
 use crate::logger;
 
 const GRID: u8 = 8;
 const TILE_DIM: u8 = 32;
+
+mod figures;
 
 pub struct GamePlugin;
 
@@ -31,15 +34,9 @@ impl Plugin for GamePlugin {
 }
 
 #[derive(Default)]
-struct CurrentSkinSet {
-    chessboard: HashMap<&'static str, Handle<Image>>,
-    figures: HashMap<&'static str, Handle<Image>>,
-}
-
-#[derive(Component)]
-struct ChessTile {
-    col: u8,
-    row: u8,
+pub struct CurrentSkinSet {
+    chessboard: HashMap<String, Handle<Image>>,
+    figures: HashMap<String, Handle<Image>>,
 }
 
 fn setup_ingame(
@@ -58,13 +55,18 @@ fn setup_ingame(
         &current_skins
     );
 
+    add_figures(
+        &mut commands,
+        &current_skins
+    );
+
     commands.insert_resource(current_skins);
 }
 
 fn update_ingame(
-
+    test_query: Query<(&Transform, &Figure)>,
 ) {
-    // TODO @jonchisko 
+
 }
 
 fn exit_ingame(
@@ -87,22 +89,23 @@ fn load_current_skins(
     };
 
     let tiles_path = skin_set.chessboard[skin_set.selected_chessboard.as_ref().expect("No selected chessboard")].clone();
-    current_skins.chessboard.insert("BLACK", asset_server.load(&(tiles_path.clone() + "map_tile_dark.png")));
-    current_skins.chessboard.insert("WHITE", asset_server.load(&(tiles_path.clone() + "map_tile_white.png")));
+    current_skins.chessboard.insert("BLACK".to_string(), asset_server.load(&(tiles_path.clone() + "map_tile_dark.png")));
+    current_skins.chessboard.insert("WHITE".to_string(), asset_server.load(&(tiles_path.clone() + "map_tile_white.png")));
 
     let figures_path = skin_set.figures[skin_set.selected_figures.as_ref().expect("No selected figures")].clone();
-    current_skins.figures.insert("BLACK_PAWN", asset_server.load(&(figures_path.clone() + "black/pawn.png")));
-    current_skins.figures.insert("BLACK_KING", asset_server.load(&(figures_path.clone() + "black/king.png")));
-    current_skins.figures.insert("BLACK_QUEEN", asset_server.load(&(figures_path.clone() + "black/queen.png")));
-    current_skins.figures.insert("BLACK_KNIGHT", asset_server.load(&(figures_path.clone() + "black/knight.png")));
-    current_skins.figures.insert("BLACK_FORT", asset_server.load(&(figures_path.clone() + "black/fort.png"))); // rook u nub @jonchisko
-    current_skins.figures.insert("BLACK_BISHOP", asset_server.load(&(figures_path.clone() + "black/bishop.png")));
-    current_skins.figures.insert("WHITE_PAWN", asset_server.load(&(figures_path.clone() + "white/pawn.png")));
-    current_skins.figures.insert("WHITE_KING", asset_server.load(&(figures_path.clone() + "white/king.png")));
-    current_skins.figures.insert("WHITE_QUEEN", asset_server.load(&(figures_path.clone() + "white/queen.png")));
-    current_skins.figures.insert("WHITE_KNIGHT", asset_server.load(&(figures_path.clone() + "white/knight.png")));
-    current_skins.figures.insert("WHITE_FORT", asset_server.load(&(figures_path.clone() + "white/fort.png")));
-    current_skins.figures.insert("WHITE_BISHOP", asset_server.load(&(figures_path.clone() + "white/bishop.png")));
+    logger::log(&figures_path);
+    current_skins.figures.insert("BLACK_PAWN".to_string(), asset_server.load(&(figures_path.clone() + "black/pawn.png")));
+    current_skins.figures.insert("BLACK_KING".to_string(), asset_server.load(&(figures_path.clone() + "black/king.png")));
+    current_skins.figures.insert("BLACK_QUEEN".to_string(), asset_server.load(&(figures_path.clone() + "black/queen.png")));
+    current_skins.figures.insert("BLACK_KNIGHT".to_string(), asset_server.load(&(figures_path.clone() + "black/knight.png")));
+    current_skins.figures.insert("BLACK_FORT".to_string(), asset_server.load(&(figures_path.clone() + "black/fort.png"))); // rook u nub @jonchisko
+    current_skins.figures.insert("BLACK_BISHOP".to_string(), asset_server.load(&(figures_path.clone() + "black/bishop.png")));
+    current_skins.figures.insert("WHITE_PAWN".to_string(), asset_server.load(&(figures_path.clone() + "white/pawn.png")));
+    current_skins.figures.insert("WHITE_KING".to_string(), asset_server.load(&(figures_path.clone() + "white/king.png")));
+    current_skins.figures.insert("WHITE_QUEEN".to_string(), asset_server.load(&(figures_path.clone() + "white/queen.png")));
+    current_skins.figures.insert("WHITE_KNIGHT".to_string(), asset_server.load(&(figures_path.clone() + "white/knight.png")));
+    current_skins.figures.insert("WHITE_FORT".to_string(), asset_server.load(&(figures_path.clone() + "white/fort.png")));
+    current_skins.figures.insert("WHITE_BISHOP".to_string(), asset_server.load(&(figures_path.clone() + "white/bishop.png")));
     
     current_skins
 }
@@ -111,25 +114,37 @@ fn construct_chessboard(
     commands: &mut Commands,
     current_skins: &CurrentSkinSet,
 ) {
-    let compute_offset: f32 = -(GRID as i8 / 2) as f32 * TILE_DIM as f32;
+    
     for row in 0..GRID {
         for col in 0..GRID {
+            let tile_component;
             let map_tile = if (col + row) % 2 == 0 {
+                tile_component = ChessTile::build_black(col, row);
                 current_skins.chessboard["BLACK"].clone()
             } else {
+                tile_component = ChessTile::build_white(col, row);
                 current_skins.chessboard["WHITE"].clone()
             };
             commands.spawn_bundle(SpriteBundle {
                 transform: Transform {
-                    translation: Vec3::new(col as f32 * TILE_DIM as f32 + compute_offset, row as f32 * TILE_DIM as f32 + compute_offset, 0.0),
+                    translation: transform_grid_to_world(col, row, TILE_DIM, -0.001),
                     ..Default::default()
                 },
                 texture: map_tile,
                 ..Default::default()
-            }).insert(ChessTile {
-                row,
-                col,
-            });
+            }).insert(tile_component);
         }
     }
+}
+
+fn add_figures(
+    commands: &mut Commands,
+    current_skins: &CurrentSkinSet,
+) {
+    figures::get_figures(commands, current_skins);
+}
+
+fn transform_grid_to_world(col: u8, row: u8, tile_dim: u8, z: f32) -> Vec3 {
+    let compute_offset: f32 = -(GRID as i8 / 2) as f32 * TILE_DIM as f32;
+    Vec3::new(col as f32 * tile_dim as f32 + compute_offset, row as f32 * tile_dim as f32 + compute_offset, z)
 }

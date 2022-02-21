@@ -177,7 +177,7 @@ pub fn get_figures(
     .insert(FigureMetadata {
         number_of_moves: 0,
         is_enpassant_valid: false,
-    });;
+    });
 
     let b_fort = Figure::build_b_fort((7, 7));
     commands.spawn_bundle(SpriteBundle{
@@ -192,7 +192,7 @@ pub fn get_figures(
     .insert(FigureMetadata {
         number_of_moves: 0,
         is_enpassant_valid: false,
-    });;
+    });
 
     let b_knight = Figure::build_b_knight((1, 7));
     commands.spawn_bundle(SpriteBundle{
@@ -207,7 +207,7 @@ pub fn get_figures(
     .insert(FigureMetadata {
         number_of_moves: 0,
         is_enpassant_valid: false,
-    });;
+    });
 
     let b_knight = Figure::build_b_knight((6, 7));
     commands.spawn_bundle(SpriteBundle{
@@ -222,7 +222,7 @@ pub fn get_figures(
     .insert(FigureMetadata {
         number_of_moves: 0,
         is_enpassant_valid: false,
-    });;
+    });
 
     let b_bishop = Figure::build_b_bishop((2, 7));
     commands.spawn_bundle(SpriteBundle{
@@ -237,7 +237,7 @@ pub fn get_figures(
     .insert(FigureMetadata {
         number_of_moves: 0,
         is_enpassant_valid: false,
-    });;
+    });
 
     let b_bishop = Figure::build_b_bishop((5, 7));
     commands.spawn_bundle(SpriteBundle{
@@ -252,7 +252,7 @@ pub fn get_figures(
     .insert(FigureMetadata {
         number_of_moves: 0,
         is_enpassant_valid: false,
-    });;
+    });
 
     let b_queen = Figure::build_b_queen((3, 7));
     commands.spawn_bundle(SpriteBundle{

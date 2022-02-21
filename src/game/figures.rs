@@ -5,9 +5,10 @@ use super::CurrentSkinSet;
 
 #[derive(Component, Clone, Copy)]
 pub struct Figure {
-    figure_type: FigureType,
-    color: ChessColor,
-    current_position: (u8, u8),
+    pub figure_type: FigureType,
+    pub color: ChessColor,
+    pub col: u8,
+    pub row: u8,
 }
 
 impl Figure {
@@ -67,13 +68,14 @@ impl Figure {
         Figure {
             figure_type,
             color,
-            current_position
+            col: current_position.0,
+            row: current_position.1,
         }
     }
 }
 
 #[derive(Clone, Copy)]
-enum FigureType {
+pub enum FigureType {
     Pawn,
     Fort,
     Bishop,
@@ -95,8 +97,8 @@ impl FigureType {
     }
 }
 
-#[derive(Clone, Copy)]
-enum ChessColor {
+#[derive(Clone, Copy, Eq, PartialEq,)]
+pub enum ChessColor {
     White,
     Black,
 }
@@ -112,9 +114,9 @@ impl ChessColor {
 
 #[derive(Component, Clone, Copy)]
 pub struct ChessTile {
-    color: ChessColor,
-    col: u8,
-    row: u8,
+    pub color: ChessColor,
+    pub col: u8,
+    pub row: u8,
 }
 
 impl ChessTile {

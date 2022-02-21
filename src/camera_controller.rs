@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-const CAMERA_SCALE: f32 = 0.33;
+pub const CAMERA_SCALE: f32 = 0.33;
 const CAMERA_MOVE_SPEED: f32 = 3.0f32;
 
 pub struct CameraControllerPlugin;
@@ -19,7 +19,7 @@ struct PrevCursorPos {
 }
 
 #[derive(Component)]
-struct MainCamera;
+pub struct MainCamera;
 
 
 fn setup(mut commands: Commands) {

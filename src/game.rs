@@ -11,6 +11,7 @@ const GRID: u8 = 8;
 const TILE_DIM: u8 = 32;
 
 mod figures;
+mod clicker;
 
 pub struct GamePlugin;
 

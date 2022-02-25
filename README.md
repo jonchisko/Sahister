@@ -1,2 +1,2 @@
 # Sahister
-A simple 2d implementation of chess using Bevy game engine.
+A simple "ui" implementation of chess in rust - basically all of the stuff without actual gameplay.

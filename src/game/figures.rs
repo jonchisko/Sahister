@@ -3,60 +3,60 @@ use bevy::prelude::*;
 use super::CurrentSkinSet;
 
 
-#[derive(Component, Clone, Copy)]
+#[derive(Component, Clone, Copy, PartialEq, Eq)]
 pub struct Figure {
     pub figure_type: FigureType,
     pub color: ChessColor,
-    pub col: u8,
-    pub row: u8,
+    pub col: i32,
+    pub row: i32,
 }
 
 impl Figure {
-    pub fn build_b_pawn(pos: (u8, u8)) -> Figure {
+    pub fn build_b_pawn(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Pawn, ChessColor::Black, pos)
     }
 
-    pub fn build_b_fort(pos: (u8, u8)) -> Figure {
+    pub fn build_b_fort(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Fort, ChessColor::Black, pos)
     }
 
-    pub fn build_b_knight(pos: (u8, u8)) -> Figure {
+    pub fn build_b_knight(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Knight, ChessColor::Black, pos)
     }
 
-    pub fn build_b_bishop(pos: (u8, u8)) -> Figure {
+    pub fn build_b_bishop(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Bishop, ChessColor::Black, pos)
     }
 
-    pub fn build_b_king(pos: (u8, u8)) -> Figure {
+    pub fn build_b_king(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::King, ChessColor::Black, pos)
     }
     
-    pub fn build_b_queen(pos: (u8, u8)) -> Figure {
+    pub fn build_b_queen(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Queen, ChessColor::Black, pos)
     }
 
-    pub fn build_w_pawn(pos: (u8, u8)) -> Figure {
+    pub fn build_w_pawn(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Pawn, ChessColor::White, pos)
     }
 
-    pub fn build_w_fort(pos: (u8, u8)) -> Figure {
+    pub fn build_w_fort(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Fort, ChessColor::White, pos)
     }
 
-    pub fn build_w_knight(pos: (u8, u8)) -> Figure {
+    pub fn build_w_knight(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Knight, ChessColor::White, pos)
     }
 
-    pub fn build_w_bishop(pos: (u8, u8)) -> Figure {
+    pub fn build_w_bishop(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Bishop, ChessColor::White, pos)
     }
 
-    pub fn build_w_king(pos: (u8, u8)) -> Figure {
+    pub fn build_w_king(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::King, ChessColor::White, pos)
     }
     
-    pub fn build_w_queen(pos: (u8, u8)) -> Figure {
+    pub fn build_w_queen(pos: (i32, i32)) -> Figure {
         Figure::build(FigureType::Queen, ChessColor::White, pos)
     }
 
@@ -64,7 +64,7 @@ impl Figure {
         format!("{}_{}", self.color.get_str(), self.figure_type.get_str())
     }
 
-    fn build(figure_type: FigureType, color: ChessColor, current_position: (u8, u8)) -> Figure {
+    fn build(figure_type: FigureType, color: ChessColor, current_position: (i32, i32)) -> Figure {
         Figure {
             figure_type,
             color,
@@ -74,7 +74,7 @@ impl Figure {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Eq, PartialEq,)]
 pub enum FigureType {
     Pawn,
     Fort,
@@ -112,23 +112,23 @@ impl ChessColor {
     }
 }
 
-#[derive(Component, Clone, Copy)]
+#[derive(Component, Clone, Copy, PartialEq, Eq)]
 pub struct ChessTile {
     pub color: ChessColor,
-    pub col: u8,
-    pub row: u8,
+    pub col: i32,
+    pub row: i32,
 }
 
 impl ChessTile {
-    pub fn build_white(col: u8, row: u8) -> ChessTile {
+    pub fn build_white(col: i32, row: i32) -> ChessTile {
         ChessTile::build(ChessColor::White, col, row)
     }
 
-    pub fn build_black(col: u8, row: u8) -> ChessTile {
+    pub fn build_black(col: i32, row: i32) -> ChessTile {
         ChessTile::build(ChessColor::Black, col, row)
     }
 
-    fn build(color: ChessColor, col: u8, row: u8) -> ChessTile {
+    fn build(color: ChessColor, col: i32, row: i32) -> ChessTile {
         ChessTile {
             color,
             col,
@@ -149,7 +149,7 @@ pub fn get_figures(
 ) {
     //BLACK PAWNS
     for col in 0..crate::game::GRID {
-        let row = 6u8;
+        let row = 6;
         let b_pawn = Figure::build_b_pawn((col, row));
         commands.spawn_bundle(SpriteBundle{
             transform: Transform {
@@ -288,7 +288,7 @@ pub fn get_figures(
 
     //WHITE PAWNS
     for col in 0..crate::game::GRID {
-        let row = 1u8;
+        let row = 1;
         let w_pawn = Figure::build_w_pawn((col, row));
         commands.spawn_bundle(SpriteBundle{
             transform: Transform {

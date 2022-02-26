@@ -1,25 +1,26 @@
 use bevy::prelude::*;
 use super::figures::{ChessTile, Figure, ChessColor};
+use crate::app_states::AppState;
+use super::CurrentPlayer;
 use crate::camera_controller::{self, MainCamera};
 
-struct ClickerGamePlugin;
+pub struct ClickerGamePlugin;
 
 impl Plugin for ClickerGamePlugin {
     fn build(&self, app: &mut App) {
-
+        app
+            .insert_resource(TheTwoSelections::new())
+            .add_system_set(
+                SystemSet::on_update(AppState::InGame)
+                    .with_system(click_tile)
+            );
     }
 }
 
-
 #[derive(Default)]
-struct CurrentPlayer {
-    current_color: Option<ChessColor>,
-}
-
-#[derive(Default)]
-struct TheTwoSelections {
-    selection1: Option<(ChessTile, Option<Figure>)>,
-    selection2: Option<(ChessTile, Option<Figure>)>,
+pub struct TheTwoSelections {
+    pub selection1: Option<(ChessTile, Option<Figure>)>,
+    pub selection2: Option<(ChessTile, Option<Figure>)>,
 }
 
 impl TheTwoSelections {
@@ -107,7 +108,7 @@ fn set_selections(
 ) {
     if selections.selection1.is_none() {
         if let Some(fig) = figure {
-            if fig.color == current_player.current_color.expect("Current player is missing current color") {
+            if fig.color == current_player.color.expect("Current player is missing current color") {
                 selections.selection1 = Some((clicked_tile, figure));
             }
         }
